@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { addEmployee } from "@/store/slices/employeeSlice";
@@ -8,13 +10,22 @@ import type { AppDispatch } from "@/store";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { validateEmployeeForm, getFieldError } from "@/utils/validation";
-import type { EmployeeFormData } from "@/types/employee";
 import { EmployeeStatus } from "@/types/employee";
 import { DEPARTMENTS, DESIGNATIONS } from "@/constants/employee";
 import { useUI } from "@/hooks/useUI";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+
+const employeeSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  department: z.string().min(1, "Department is required"),
+  designation: z.string().min(1, "Designation is required"),
+  status: z.nativeEnum(EmployeeStatus),
+});
+
+type EmployeeFormData = z.infer<typeof employeeSchema>;
 
 const initialFormData: EmployeeFormData = {
   firstName: "",
@@ -29,79 +40,23 @@ export function EmployeeForm() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { showToast } = useUI();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<EmployeeFormData>(initialFormData);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<EmployeeFormData>({
+    resolver: zodResolver(employeeSchema),
+    defaultValues: initialFormData,
+  });
 
-      if (touched[name]) {
-        const validationErrors = validateEmployeeForm({
-          ...formData,
-          [name]: value,
-        });
-        const fieldError = getFieldError(validationErrors, name);
-        setErrors((prev) => ({
-          ...prev,
-          [name]: fieldError || "",
-        }));
-      }
-    },
-    [formData, touched],
-  );
-
-  const handleBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name } = e.target;
-      setTouched((prev) => ({ ...prev, [name]: true }));
-
-      const validationErrors = validateEmployeeForm(formData);
-      const fieldError = getFieldError(validationErrors, name);
-      setErrors((prev) => ({
-        ...prev,
-        [name]: fieldError || "",
-      }));
-    },
-    [formData],
-  );
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Mark all fields as touched
-    const allTouched: Record<string, boolean> = {};
-    Object.keys(formData).forEach((key) => {
-      allTouched[key] = true;
-    });
-    setTouched(allTouched);
-
-    // Validate all fields
-    const validationErrors = validateEmployeeForm(formData);
-    if (validationErrors.length > 0) {
-      const errorMap: Record<string, string> = {};
-      validationErrors.forEach((err) => {
-        errorMap[err.field] = err.message;
-      });
-      setErrors(errorMap);
-      showToast({ message: "Please fix the errors below", type: "error" });
-      return;
-    }
-
-    setLoading(true);
-    setErrors({});
-
+  const onSubmit = async (data: EmployeeFormData) => {
     try {
-      await dispatch(addEmployee(formData)).unwrap();
+      await dispatch(addEmployee(data)).unwrap();
       showToast({ message: "Employee added successfully!", type: "success" });
       router.replace("/employees"); // Use replace to prevent back-button loops to the form
     } catch (error) {
       showToast({ message: error as string, type: "error" });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -125,16 +80,16 @@ export function EmployeeForm() {
       <div className="mb-6">
         <Link
           href="/employees"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Employees
         </Link>
       </div>
 
-      <div className="card">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+      <div className="card ">
+        <div className="px-6 py-4 border-b border-gray-200 ">
+          <h2 className="text-lg font-semibold text-gray-900 ">
             Add New Employee
           </h2>
           <p className="text-sm text-gray-600 mt-1">
@@ -142,25 +97,19 @@ export function EmployeeForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.firstName}
+              {...register("firstName")}
+              error={errors.firstName?.message}
               placeholder="John"
               required
             />
             <Input
               label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.lastName}
+              {...register("lastName")}
+              error={errors.lastName?.message}
               placeholder="Doe"
               required
             />
@@ -168,12 +117,9 @@ export function EmployeeForm() {
 
           <Input
             label="Email Address"
-            name="email"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={errors.email}
+            {...register("email")}
+            error={errors.email?.message}
             placeholder="john.doe@company.com"
             required
           />
@@ -181,22 +127,16 @@ export function EmployeeForm() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               label="Department"
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.department}
+              {...register("department")}
+              error={errors.department?.message}
               options={departmentOptions}
               placeholder="Select department"
               required
             />
             <Select
               label="Designation"
-              name="designation"
-              value={formData.designation}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={errors.designation}
+              {...register("designation")}
+              error={errors.designation?.message}
               options={designationOptions}
               placeholder="Select designation"
               required
@@ -205,11 +145,8 @@ export function EmployeeForm() {
 
           <Select
             label="Status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={errors.status}
+            {...register("status")}
+            error={errors.status?.message}
             options={statusOptions}
             required
           />
@@ -222,7 +159,7 @@ export function EmployeeForm() {
             </Link>
             <Button
               type="submit"
-              isLoading={loading}
+              isLoading={isSubmitting}
               leftIcon={<Save className="w-4 h-4" />}
               className="flex-1"
             >

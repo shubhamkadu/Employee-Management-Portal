@@ -1,16 +1,18 @@
 # Employee Management Portal
 
-A production-ready employee management application built with Next.js 14, React 18, TypeScript, Redux Toolkit, and TanStack Table.
+A production-ready employee management application built with Next.js 16, React 19, TypeScript, Redux Toolkit, and TanStack Table.
 
 ## Features
 
 ### Authentication
+
 - Secure login with hardcoded credentials (admin@test.com / Admin@123)
 - JWT-like token-based session persistence via localStorage
 - Protected routes with middleware and client-side guards
 - Automatic redirect to login for unauthenticated users
 
 ### Employee Management
+
 - **Employee Listing**: Paginated, sortable, and filterable table view
 - **Search**: Real-time search by name or email with debouncing
 - **Filters**: Filter by department and status
@@ -21,16 +23,19 @@ A production-ready employee management application built with Next.js 14, React 
 - **Add Employee**: Form with validation to create new employees (stored in localStorage)
 
 ### State Preservation (Critical Feature)
+
 - Search text, filters, sort preferences, and page number are preserved in sessionStorage
 - Users resume exactly where they left off when navigating back from employee details
 - State is automatically restored on page reload
 
 ### Responsive Design
+
 - **Desktop**: Full-featured table layout with TanStack Table
 - **Mobile**: Card-based layout with all functionality maintained
 - Adaptive sidebar navigation with mobile overlay
 
 ### Technical Highlights
+
 - **Redux Toolkit**: Centralized state management with slices for auth, employees, and UI
 - **TanStack Table**: Advanced table features with sorting, filtering, and pagination
 - **TypeScript**: Strict type safety throughout with no `any` types
@@ -40,14 +45,14 @@ A production-ready employee management application built with Next.js 14, React 
 - **Debounced Search**: Optimized search performance
 - **Loading States**: Skeleton loaders for better UX
 - **Toast Notifications**: User feedback for actions
-- **Form Validation**: Real-time validation with clear error messages
+- **Type-Safe Forms**: Robust validation using **Zod** schemas and **React Hook Form** for efficient state management
 
 ## Technology Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **UI Library**: React 18
+- **Framework**: Next.js 16 (App Router)
+- **UI Library**: React 19
 - **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS 4
 - **State Management**: Redux Toolkit + React Redux
 - **Table**: TanStack Table (React Table v8)
 - **Icons**: Lucide React
@@ -118,22 +123,26 @@ src/
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. **Extract the ZIP file** and navigate to the project directory:
+
 ```bash
 cd employee-management-app
 ```
 
 2. **Install dependencies**:
+
 ```bash
 npm install
 ```
 
 3. **Run the development server**:
+
 ```bash
 npm run dev
 ```
@@ -141,6 +150,7 @@ npm run dev
 4. **Open your browser** and navigate to `http://localhost:3000`
 
 ### Build for Production
+
 ```bash
 npm run build
 npm start
@@ -154,6 +164,7 @@ npm start
 ## Technical Decisions
 
 ### Why Redux Toolkit?
+
 - **Predictable state management**: Single source of truth for application state
 - **DevTools support**: Excellent debugging experience with time-travel debugging
 - **Middleware**: Built-in thunk support for async actions
@@ -161,6 +172,7 @@ npm start
 - **Scalability**: Well-suited for larger applications with complex state interactions
 
 ### Why TanStack Table?
+
 - **Headless architecture**: Full control over styling and markup
 - **Performance**: Virtualization-ready with efficient rendering
 - **Features**: Built-in sorting, filtering, and pagination APIs
@@ -168,18 +180,21 @@ npm start
 - **Flexibility**: Works with any UI framework
 
 ### Why App Router over Pages Router?
+
 - **Server Components**: Better performance with reduced client-side JavaScript
 - **Nested Layouts**: Shared UI between routes without re-rendering
 - **Middleware**: Route-level protection before rendering
 - **Future-proof**: Next.js is pushing App Router as the default
 
 ### State Preservation Strategy
+
 - **sessionStorage**: Used for employee listing state (filters, sort, pagination)
 - **localStorage**: Used for auth state and locally added employees
 - **Why sessionStorage for listing state?**: Persists across page reloads but clears when tab closes, which is appropriate for temporary UI state
 - **Why localStorage for auth?**: Auth state should persist across sessions
 
 ### Data Flow
+
 1. API data is fetched from DummyJSON and mapped to our Employee domain model
 2. Locally added employees are stored in localStorage and merged with API data
 3. Filtering and sorting happen on the client side for responsiveness
@@ -196,18 +211,20 @@ npm start
 
 ## Third-Party Libraries
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| next | 14.2.3 | React framework with App Router |
-| react | 18.3.1 | UI library |
-| react-dom | 18.3.1 | React DOM renderer |
-| @reduxjs/toolkit | 2.2.5 | State management |
-| react-redux | 9.1.2 | React bindings for Redux |
-| @tanstack/react-table | 8.17.3 | Headless table component |
-| tailwindcss | 3.4.4 | Utility-first CSS framework |
-| lucide-react | 0.394.0 | Icon library |
-| clsx | 2.1.1 | Conditional class names |
-| tailwind-merge | 2.3.0 | Merge Tailwind classes |
+| Library               | Version | Purpose                         |
+| --------------------- | ------- | ------------------------------- |
+| next                  | 16.2.7  | React framework with App Router |
+| react                 | 19.2.7  | UI library                      |
+| react-dom             | 19.2.7  | React DOM renderer              |
+| @reduxjs/toolkit      | 2.2.5   | State management                |
+| react-redux           | 9.1.2   | React bindings for Redux        |
+| @tanstack/react-table | 8.17.3  | Headless table component        |
+| tailwindcss           | 4.3.0   | Utility-first CSS framework     |
+| lucide-react          | 1.17.0  | Icon library                    |
+| clsx                  | 2.1.1   | Conditional class names         |
+| tailwind-merge        | 2.3.0   | Merge Tailwind classes          |
+| zod                   | 3.24.1  | Schema validation               |
+| react-hook-form       | 7.54.2  | Form management                 |
 
 ## Performance Optimizations
 

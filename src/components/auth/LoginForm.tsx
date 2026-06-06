@@ -76,7 +76,7 @@ export function LoginForm() {
               <Building2 className="w-10 h-10 text-primary-600" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Employee Portal</h1>
+          <h1 className="text-2xl font-bold ">Employee Portal</h1>
           <p className="text-gray-600 mt-2">Sign in to manage your employees</p>
         </div>
 
