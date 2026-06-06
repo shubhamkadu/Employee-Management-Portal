@@ -4,9 +4,10 @@ const DUMMYJSON_BASE = "https://dummyjson.com";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const targetUrl = `${DUMMYJSON_BASE}/users/${params.id}`;
+  const { id } = await params;
+  const targetUrl = `${DUMMYJSON_BASE}/users/${id}`;
 
   const response = await fetch(targetUrl, {
     headers: { "Content-Type": "application/json" },
