@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import type { Employee } from '@/types/employee';
-import { EmployeeStatus } from '@/types/employee';
-import { Card, CardContent } from '@/components/ui/Card';
-import { cn } from '@/utils/helpers';
-import Link from 'next/link';
-import { Eye, Mail, Briefcase } from 'lucide-react';
+import type { Employee } from "@/types/employee";
+import { EmployeeStatus } from "@/types/employee";
+import { Card, CardContent } from "@/components/ui/Card";
+import { cn } from "@/utils/helpers";
+import Link from "next/link";
+import { Eye, Mail, Briefcase } from "lucide-react";
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -20,7 +20,8 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold">
-              {employee.firstName[0]}{employee.lastName[0]}
+              {employee.firstName[0]}
+              {employee.lastName[0]}
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">
@@ -31,26 +32,26 @@ export function EmployeeCard({ employee }: EmployeeCardProps) {
           </div>
           <span
             className={cn(
-              'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+              "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
               isActive
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800",
             )}
           >
             <span
               className={cn(
-                'w-1.5 h-1.5 rounded-full mr-1',
-                isActive ? 'bg-green-500' : 'bg-red-500'
+                "w-1.5 h-1.5 rounded-full mr-1",
+                isActive ? "bg-green-500" : "bg-red-500",
               )}
             />
-            {isActive ? 'Active' : 'Inactive'}
+            {isActive ? "Active" : "Inactive"}
           </span>
         </div>
 
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Mail className="w-4 h-4 text-gray-400" />
-            {employee.email}
+            <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <span className="truncate">{employee.email}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Briefcase className="w-4 h-4 text-gray-400" />

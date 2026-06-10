@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from "react";
 import { useAuth } from '@/hooks/useAuth';
 import { useUI } from '@/hooks/useUI';
 import { Button } from '@/components/ui/Button';
@@ -9,17 +10,16 @@ import type { AppDispatch } from '@/store';
 import { Menu, LogOut, User, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
   const { toggleSidebarMenu } = useUI();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push('/login');
-  };
+  const handleLogout = useCallback(async () => {
+    await dispatch(logout()).unwrap();
+    router.replace("/login");
+  }, [dispatch, router]);
 
   if (!isAuthenticated) return null;
 

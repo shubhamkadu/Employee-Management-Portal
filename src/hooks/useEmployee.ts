@@ -1,40 +1,53 @@
-'use client';
+"use client";
 
-import { useSelector, useDispatch } from 'react-redux';
-import type { RootState, AppDispatch } from '@/store';
-import { setFilters, setSort, setPage, setPageSize } from '@/store/slices/employeeSlice';
-import type { EmployeeFilters, EmployeeSort } from '@/types/employee';
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import type { AppDispatch, RootState } from "@/store";
+import {
+  setFilters,
+  setSort,
+  setPage,
+  setPageSize,
+} from "@/store/slices/employeeSlice";
+
+import type { EmployeeFilters, EmployeeSort } from "@/types/employee";
 
 export function useEmployeeState() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { employees, loading, error, filters, sort, pagination } = useSelector(
-    (state: RootState) => state.employee
+  const employeeState = useSelector((state: RootState) => state.employee);
+
+  const updateFilters = useCallback(
+    (filters: Partial<EmployeeFilters>) => {
+      dispatch(setFilters(filters));
+    },
+    [dispatch],
   );
 
-  const updateFilters = (newFilters: Partial<EmployeeFilters>) => {
-    dispatch(setFilters(newFilters));
-  };
+  const updateSort = useCallback(
+    (sort: EmployeeSort) => {
+      dispatch(setSort(sort));
+    },
+    [dispatch],
+  );
 
-  const updateSort = (newSort: EmployeeSort) => {
-    dispatch(setSort(newSort));
-  };
+  const updatePage = useCallback(
+    (page: number) => {
+      dispatch(setPage(page));
+    },
+    [dispatch],
+  );
 
-  const updatePage = (page: number) => {
-    dispatch(setPage(page));
-  };
-
-  const updatePageSize = (pageSize: number) => {
-    dispatch(setPageSize(pageSize));
-  };
+  const updatePageSize = useCallback(
+    (pageSize: number) => {
+      dispatch(setPageSize(pageSize));
+    },
+    [dispatch],
+  );
 
   return {
-    employees,
-    loading,
-    error,
-    filters,
-    sort,
-    pagination,
+    ...employeeState,
     updateFilters,
     updateSort,
     updatePage,

@@ -36,6 +36,21 @@
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
   }
@@ -66,5 +81,5 @@
 }
 
 @utility table-cell {
-  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  @apply px-6 py-4 whitespace-normal text-sm text-gray-900;
 }

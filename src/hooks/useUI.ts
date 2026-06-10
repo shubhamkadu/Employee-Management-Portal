@@ -1,23 +1,24 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState, AppDispatch } from "@/store";
+import { useCallback, useEffect } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import type { AppDispatch, RootState } from "@/store";
+
 import {
   addToast,
   removeToast,
   toggleSidebar,
   setIsMobile,
 } from "@/store/slices/uiSlice";
+
 import type { Toast } from "@/types/ui";
-import { useCallback, useEffect, useState } from "react";
 
 export function useUI() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { toasts, sidebarOpen } = useSelector((state: RootState) => state.ui);
-
-  // SSR-safe mobile detection
-  const [isMobile, setIsMobileLocal] = useState(false);
+  const uiState = useSelector((state: RootState) => state.ui);
 
   const showToast = useCallback(
     (toast: Omit<Toast, "id">) => {
@@ -38,21 +39,23 @@ export function useUI() {
   }, [dispatch]);
 
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobileLocal(mobile);
-      dispatch(setIsMobile(mobile));
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    const updateDeviceState = () => {
+      dispatch(setIsMobile(mediaQuery.matches));
     };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    updateDeviceState();
+
+    mediaQuery.addEventListener("change", updateDeviceState);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateDeviceState);
+    };
   }, [dispatch]);
 
   return {
-    toasts,
-    sidebarOpen,
-    isMobile,
+    ...uiState,
     showToast,
     hideToast,
     toggleSidebarMenu,

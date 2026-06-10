@@ -1,13 +1,20 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { ClientProviders } from '@/components/ClientProviders';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ClientProviders } from "@/components/ClientProviders";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Employee Management Portal',
-  description: 'A production-ready employee management application built with Next.js and React',
+  title: "Employee Management Portal",
+  description:
+    "A production-ready employee management application built with Next.js and React",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

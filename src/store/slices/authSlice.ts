@@ -1,17 +1,25 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import type { AuthState, LoginCredentials, User } from '@/types/auth';
-import { HARDCODED_CREDENTIALS, AUTH_TOKEN_KEY, AUTH_USER_KEY } from '@/constants/auth';
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import type { AuthState, LoginCredentials, User } from "@/types/auth";
+import {
+  HARDCODED_CREDENTIALS,
+  AUTH_TOKEN_KEY,
+  AUTH_USER_KEY,
+} from "@/constants/auth";
 
-const AUTH_COOKIE_KEY = 'auth_token';
+const AUTH_COOKIE_KEY = "auth_token";
 const AUTH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 function setAuthCookie(token: string): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
   document.cookie = `${AUTH_COOKIE_KEY}=${token}; path=/; max-age=${AUTH_COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
 function clearAuthCookie(): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
   document.cookie = `${AUTH_COOKIE_KEY}=; path=/; max-age=0; SameSite=Lax`;
 }
 
@@ -24,23 +32,21 @@ const initialState: AuthState = {
 };
 
 export const login = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
       if (
         credentials.email === HARDCODED_CREDENTIALS.email &&
         credentials.password === HARDCODED_CREDENTIALS.password
       ) {
         const user: User = {
           email: credentials.email,
-          name: 'Admin User',
+          name: "Admin User",
         };
 
         const token = btoa(`${credentials.email}:${Date.now()}`);
 
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           localStorage.setItem(AUTH_TOKEN_KEY, token);
           localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
           setAuthCookie(token);
@@ -49,15 +55,15 @@ export const login = createAsyncThunk(
         return { user, token };
       }
 
-      return rejectWithValue('Invalid email or password');
+      return rejectWithValue("Invalid email or password");
     } catch (error) {
-      return rejectWithValue('An unexpected error occurred');
+      return rejectWithValue("An unexpected error occurred");
     }
-  }
+  },
 );
 
-export const logout = createAsyncThunk('auth/logout', async () => {
-  if (typeof window !== 'undefined') {
+export const logout = createAsyncThunk("auth/logout", async () => {
+  if (typeof window !== "undefined") {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
     clearAuthCookie();
@@ -65,8 +71,8 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   return null;
 });
 
-export const restoreAuth = createAsyncThunk('auth/restore', async () => {
-  if (typeof window === 'undefined') {
+export const restoreAuth = createAsyncThunk("auth/restore", async () => {
+  if (typeof window === "undefined") {
     return { user: null, token: null };
   }
 
@@ -87,7 +93,7 @@ export const restoreAuth = createAsyncThunk('auth/restore', async () => {
 });
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -100,12 +106,15 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<{ user: User; token: string }>) => {
-        state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.error = null;
-      })
+      .addCase(
+        login.fulfilled,
+        (state, action: PayloadAction<{ user: User; token: string }>) => {
+          state.loading = false;
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+          state.error = null;
+        },
+      )
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.isAuthenticated = false;

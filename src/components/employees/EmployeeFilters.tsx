@@ -62,7 +62,7 @@ export function EmployeeFilters() {
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -75,18 +75,18 @@ export function EmployeeFilters() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
           <Select
             options={departmentOptions}
             value={filters.department}
             onChange={handleDepartmentChange}
-            className="w-48"
+            className="w-full sm:w-48"
           />
           <Select
             options={statusOptions}
             value={filters.status}
             onChange={handleStatusChange}
-            className="w-40"
+            className="w-full sm:w-40"
           />
 
           {hasActiveFilters && (
@@ -95,6 +95,7 @@ export function EmployeeFilters() {
               size="sm"
               onClick={clearAllFilters}
               leftIcon={<X className="w-4 h-4" />}
+              className="w-full sm:w-auto whitespace-nowrap"
             >
               Clear
             </Button>

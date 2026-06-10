@@ -1,49 +1,56 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useRouter, usePathname } from 'next/navigation';
-import type { RootState, AppDispatch } from '@/store';
-import { restoreAuth } from '@/store/slices/authSlice';
+import { useEffect, useRef, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
+
+import type { AppDispatch, RootState } from "@/store";
+import { restoreAuth, logout } from "@/store/slices/authSlice";
+import { AUTH_TOKEN_KEY } from "@/constants/auth";
+
+const PUBLIC_ROUTES = ["/login"];
 
 export function useAuth() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const pathname = usePathname();
 
-  const { user, isAuthenticated, loading, error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const initializedRef = useRef(false);
 
-  // Restore auth from storage once on mount
+  const authState = useSelector((state: RootState) => state.auth);
+
   useEffect(() => {
+    if (initializedRef.current) return;
+
+    initializedRef.current = true;
     dispatch(restoreAuth());
   }, [dispatch]);
 
-  // Handle route protection AFTER auth is restored
   useEffect(() => {
-    if (loading) return;
+    if (authState.loading) return;
 
-    const publicPaths = ['/login'];
-    const isPublicPath = publicPaths.some((path) => pathname?.startsWith(path));
+    const isPublicRoute = PUBLIC_ROUTES.some((route) =>
+      pathname.startsWith(route),
+    );
 
-    // Only redirect after hydration is complete (small delay)
-    const timer = setTimeout(() => {
-      if (!isAuthenticated && !isPublicPath) {
-        router.replace('/login');
-      }
-      if (isAuthenticated && pathname === '/login') {
-        router.replace('/employees');
-      }
-    }, 100);
+    if (!authState.isAuthenticated && !isPublicRoute) {
+      router.replace("/login");
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, loading, pathname, router]);
+    if (authState.isAuthenticated && pathname === "/login") {
+      router.replace("/employees");
+    }
+  }, [authState.loading, authState.isAuthenticated, pathname, router]);
 
-  return { user, isAuthenticated, loading, error };
+  return authState;
 }
 
 export function useRequireAuth() {
-  const { isAuthenticated, loading } = useAuth();
-  return { isAuthenticated, loading };
+  const auth = useAuth();
+
+  return {
+    isAuthenticated: auth.isAuthenticated,
+    loading: auth.loading,
+  };
 }
